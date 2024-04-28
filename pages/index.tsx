@@ -25,24 +25,44 @@ const CryptoTable = () => {
   const [data, setData] = useState<CryptoCurrency[]>([]);
   const [loading, setLoading] = useState(false);
 
-  const fetchData = async () => {
-    setLoading(true);
+  const fetchCryptoData = async () => {
+    const urls = [
+      `https://client-api-2-74b1891ee9f9.herokuapp.com/coins?offset=${0}&limit=${50}&sort=market_cap&order=DESC&includeNsfw=false&complete=false`,
+      `https://client-api-2-74b1891ee9f9.herokuapp.com/coins?offset=${50}&limit=${50}&sort=market_cap&order=DESC&includeNsfw=false&complete=false`,
+      `https://client-api-2-74b1891ee9f9.herokuapp.com/coins?offset=${100}&limit=${50}&sort=market_cap&order=DESC&includeNsfw=false&complete=false`,
+      `https://client-api-2-74b1891ee9f9.herokuapp.com/coins?offset=${150}&limit=${50}&sort=market_cap&order=DESC&includeNsfw=false&complete=false`,
+      `https://client-api-2-74b1891ee9f9.herokuapp.com/coins?offset=${200}&limit=${50}&sort=market_cap&order=DESC&includeNsfw=false&complete=false`,
+      `https://client-api-2-74b1891ee9f9.herokuapp.com/coins?offset=${250}&limit=${50}&sort=market_cap&order=DESC&includeNsfw=false&complete=false`
+    ];
     try {
-      const response = await axios.get('/api/crypto');
-      setData(response.data);
+      const promises = urls.map(url => axios.get(url));
+      const results = await Promise.all(promises);
+      return results.flatMap(result => result.data);
     } catch (error) {
       console.error('Failed to fetch data:', error);
+      throw error;
+    }
+  };
+
+  const loadData = async () => {
+    setLoading(true);
+    try {
+      const fetchedData = await fetchCryptoData();
+      setData(fetchedData);
+    } catch (error) {
+      console.error('Failed to fetch data:', error);
+      setData([]); // Handle the error state as you see fit
     }
     setLoading(false);
   };
 
   useEffect(() => {
-    fetchData();
+    loadData();
   }, []);
 
   return (
     <div>
-      <h1>Cryptocurrency Market Data <Button onClick={fetchData}>Refresh Data</Button></h1>
+      <h1>Cryptocurrency Market Data <Button onClick={loadData}>Refresh Data</Button></h1>
       <Table columns={columns} dataSource={data} loading={loading} rowKey="id" />
     </div>
   );

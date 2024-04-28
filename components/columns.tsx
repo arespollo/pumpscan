@@ -28,15 +28,11 @@ interface CryptoCurrency {
     telegram?: string;
     website?: string;
     king_of_the_hill_timestamp?: number;
+    virtual_token_reserves: number;
+    total_supply: number;
 }
 
 const columns: ColumnInterface[] = [
-    {
-        title: '#',
-        dataIndex: 'rank',
-        key: 'rank',
-        sorter: (a: CryptoCurrency, b: CryptoCurrency) => a.rank - b.rank,
-    },
     {
         title: 'Avatar',
         dataIndex: 'image_uri',
@@ -61,9 +57,22 @@ const columns: ColumnInterface[] = [
         title: 'Progress',
         dataIndex: 'progress',
         key: 'progress',
-        render: (value: number) => `${value.toFixed(1)}%`,
-        sorter: (a: CryptoCurrency, b: CryptoCurrency) => a.progress - b.progress,
-    },
+        render: (_: any, record: CryptoCurrency) => {
+            const progress = record.virtual_token_reserves && record.total_supply
+                ? record.virtual_token_reserves / record.total_supply * 100
+                : 0; // Fallback to 0 if data is not available
+            return `${progress.toFixed(1)}%`;
+        },
+        sorter: (a: CryptoCurrency, b: CryptoCurrency) => {
+            const progressA = a.virtual_token_reserves && a.total_supply
+                ? a.virtual_token_reserves / a.total_supply * 100
+                : 0;
+            const progressB = b.virtual_token_reserves && b.total_supply
+                ? b.virtual_token_reserves / b.total_supply * 100
+                : 0;
+            return progressA - progressB;
+        },
+    },    
     {
         title: 'Created Timestamp',
         dataIndex: 'created_timestamp',
