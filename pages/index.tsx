@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { Button, Table } from "antd";
+import React, { useEffect, useState, useRef } from "react";
+import { Table } from "antd";
 import axios from "axios";
 import columns from "../components/columns";
 
@@ -19,11 +19,14 @@ interface CryptoCurrency {
   telegram?: string;
   website?: string;
   king_of_the_hill_timestamp?: number;
+  virtual_token_reserves: number;
+  total_supply: number;
 }
 
 const CryptoTable = () => {
   const [data, setData] = useState<CryptoCurrency[]>([]);
-  const [loading, setLoading] = useState(false);
+  const refreshInterval = useRef<NodeJS.Timeout | null>(null); // NodeJS.Timeout for Node.js or number for browser
+  const refreshFrequency = 10000; // 10 sec, can be changed to your preferred interval
 
   const fetchCryptoData = async () => {
     const urls = [
@@ -49,56 +52,47 @@ const CryptoTable = () => {
     return Date.now() - timestamp <= timeInMillis;
   };
 
-  const getRowClassName = (record: CryptoCurrency): string => {
-    if (isRecent(record.created_timestamp, 12 * 60)) {
-      return "bg-green-200"; // Tailwind class for light green background
-    }
-    if (
-      record.king_of_the_hill_timestamp &&
-      isRecent(record.king_of_the_hill_timestamp, 30)
-    ) {
-      return "bg-green-200"; // Same Tailwind class, adjust if needed
-    }
-    return "";
-  };
-
-  const loadData = async () => {
-    setLoading(true);
+  const refreshData = async () => {
     try {
       let fetchedData = await fetchCryptoData();
       fetchedData = fetchedData.filter(
         (item) =>
-          isRecent(item.created_timestamp) && item.usd_market_cap < 70000
+          isRecent(item.created_timestamp) && item.usd_market_cap < 65000
       );
       setData(fetchedData);
     } catch (error) {
       console.error("Failed to fetch data:", error);
       setData([]); // Handle the error state as you see fit
     }
-    setLoading(false);
   };
 
   useEffect(() => {
-    loadData();
+    // Fetch data initially
+    refreshData();
+
+    // Set up the auto-refresh interval
+    refreshInterval.current = setInterval(() => {
+      refreshData();
+    }, refreshFrequency);
+
+    // Clear the interval when the component is unmounted
+    return () => {
+      if (refreshInterval.current) {
+        clearInterval(refreshInterval.current);
+      }
+    };
   }, []);
 
   return (
-    <div>
-      <h1 className="flex justify-center">Pump Scan</h1>
-      <div className="flex justify-center">
-        <Button
-          onClick={loadData}
-          className="text-white bg-blue-500 hover:bg-blue-700"
-        >
-          Refresh Data
-        </Button>
-      </div>
+    <div className="App flex flex-col items-center px-4 lg:px-4">
+      <h1 className="text-center text-4xl font-bold text-gray-800 my-6 shadow-md p-4 rounded-lg">
+        Pump Scan
+      </h1>
       <Table
         columns={columns}
         dataSource={data}
-        loading={loading}
         rowKey="id"
-        rowClassName={getRowClassName}
+        pagination={{ pageSize: 20, position: ["bottomCenter"] }}
       />
     </div>
   );
