@@ -9,7 +9,6 @@ interface CryptoCurrency {
   image_uri: string;
   symbol: string;
   usd_market_cap: number;
-  progress: number;
   created_timestamp: number;
   reply_count: number;
   last_reply: number;
@@ -19,12 +18,12 @@ interface CryptoCurrency {
   telegram?: string;
   website?: string;
   king_of_the_hill_timestamp?: number;
-  virtual_token_reserves: number;
-  total_supply: number;
 }
 
 const CryptoTable = () => {
   const [data, setData] = useState<CryptoCurrency[]>([]);
+  const [loading, setLoding] = useState<boolean>();
+
   const refreshInterval = useRef<NodeJS.Timeout | null>(null); // NodeJS.Timeout for Node.js or number for browser
   const refreshFrequency = 10000; // 10 sec, can be changed to your preferred interval
 
@@ -52,7 +51,10 @@ const CryptoTable = () => {
     return Date.now() - timestamp <= timeInMillis;
   };
 
-  const refreshData = async () => {
+  const refreshData = async (isFirst: boolean) => {
+    if (isFirst) {
+      setLoding(true);
+    }
     try {
       let fetchedData = await fetchCryptoData();
       fetchedData = fetchedData.filter(
@@ -60,6 +62,7 @@ const CryptoTable = () => {
           isRecent(item.created_timestamp) && item.usd_market_cap < 65000
       );
       setData(fetchedData);
+      setLoding(false);
     } catch (error) {
       console.error("Failed to fetch data:", error);
       setData([]); // Handle the error state as you see fit
@@ -68,11 +71,10 @@ const CryptoTable = () => {
 
   useEffect(() => {
     // Fetch data initially
-    refreshData();
-
+    refreshData(true);
     // Set up the auto-refresh interval
     refreshInterval.current = setInterval(() => {
-      refreshData();
+      refreshData(false);
     }, refreshFrequency);
 
     // Clear the interval when the component is unmounted
@@ -92,6 +94,7 @@ const CryptoTable = () => {
         columns={columns}
         dataSource={data}
         rowKey="id"
+        loading={loading}
         pagination={{ pageSize: 20, position: ["bottomCenter"] }}
       />
     </div>

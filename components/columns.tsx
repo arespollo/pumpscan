@@ -18,7 +18,6 @@ interface CryptoCurrency {
   image_uri: string;
   symbol: string;
   usd_market_cap: number;
-  progress: number;
   created_timestamp: number;
   reply_count: number;
   last_reply: number;
@@ -28,8 +27,6 @@ interface CryptoCurrency {
   telegram?: string;
   website?: string;
   king_of_the_hill_timestamp?: number;
-  virtual_token_reserves: number;
-  total_supply: number;
 }
 
 const isRecent = (timestamp: number, minutes = 4320): boolean => {
@@ -69,29 +66,6 @@ const columns: ColumnInterface[] = [
       a.usd_market_cap - b.usd_market_cap,
   },
   {
-    title: "Progress",
-    dataIndex: "progress",
-    key: "progress",
-    render: (_: any, record: CryptoCurrency) => {
-      const progress =
-        record.virtual_token_reserves && record.total_supply
-          ? (record.virtual_token_reserves / record.total_supply) * 100
-          : 0; // Fallback to 0 if data is not available
-      return `${progress.toFixed(1)}%`;
-    },
-    sorter: (a: CryptoCurrency, b: CryptoCurrency) => {
-      const progressA =
-        a.virtual_token_reserves && a.total_supply
-          ? (a.virtual_token_reserves / a.total_supply) * 100
-          : 0;
-      const progressB =
-        b.virtual_token_reserves && b.total_supply
-          ? (b.virtual_token_reserves / b.total_supply) * 100
-          : 0;
-      return progressA - progressB;
-    },
-  },
-  {
     title: "Created Time",
     dataIndex: "created_timestamp",
     key: "created_timestamp",
@@ -112,6 +86,26 @@ const columns: ColumnInterface[] = [
     },
     sorter: (a: CryptoCurrency, b: CryptoCurrency) =>
       a.created_timestamp - b.created_timestamp,
+  },
+  {
+    title: "King",
+    dataIndex: "king_of_the_hill_timestamp",
+    key: "king_of_the_hill_timestamp",
+    render: (value: number | undefined, record: CryptoCurrency) => {
+      const isKOTHRecent = value && isRecent(value, 30);
+      const tagColor = isKOTHRecent ? "green" : "default"; // Choose colors as needed
+      const displayValue = value
+        ? `${Math.floor((Date.now() - value) / 60000)}m ago`
+        : "N/A";
+
+      return (
+        <Tag color={tagColor} key={value}>
+          {displayValue}
+        </Tag>
+      );
+    },
+    sorter: (a: CryptoCurrency, b: CryptoCurrency) =>
+      (a.king_of_the_hill_timestamp ?? 0) - (b.king_of_the_hill_timestamp ?? 0),
   },
   {
     title: "Reply Count",
@@ -196,26 +190,6 @@ const columns: ColumnInterface[] = [
           Website
         </a>
       ) : null,
-  },
-  {
-    title: "King",
-    dataIndex: "king_of_the_hill_timestamp",
-    key: "king_of_the_hill_timestamp",
-    render: (value: number | undefined, record: CryptoCurrency) => {
-      const isKOTHRecent = value && isRecent(value, 30);
-      const tagColor = isKOTHRecent ? "green" : "default"; // Choose colors as needed
-      const displayValue = value
-        ? `${Math.floor((Date.now() - value) / 60000)}m ago`
-        : "N/A";
-
-      return (
-        <Tag color={tagColor} key={value}>
-          {displayValue}
-        </Tag>
-      );
-    },
-    sorter: (a: CryptoCurrency, b: CryptoCurrency) =>
-      (a.king_of_the_hill_timestamp ?? 0) - (b.king_of_the_hill_timestamp ?? 0),
   },
 ];
 
