@@ -25,7 +25,7 @@ const CryptoTable = () => {
   const [loading, setLoding] = useState<boolean>();
 
   const refreshInterval = useRef<NodeJS.Timeout | null>(null); // NodeJS.Timeout for Node.js or number for browser
-  const refreshFrequency = 10000; // 10 sec, can be changed to your preferred interval
+  const refreshFrequency = 10 * 1000; // 10 sec, can be changed to your preferred interval
 
   const fetchCryptoData = async () => {
     const urls = [
@@ -53,20 +53,27 @@ const CryptoTable = () => {
 
   const refreshData = async (isFirst: boolean) => {
     if (isFirst) {
-      setLoding(true);
+      setLoding(true); // Start loading only if it's the first load
     }
     try {
       let fetchedData = await fetchCryptoData();
+      // Filter data based on criteria
       fetchedData = fetchedData.filter(
         (item) =>
           isRecent(item.created_timestamp) && item.usd_market_cap < 65000
       );
-      setData(fetchedData);
-      setLoding(false);
+
+      // Only update the state if the filtered data is not empty
+      if (fetchedData.length > 0) {
+        setData(fetchedData);
+      } else {
+        console.log("No data found");
+      }
     } catch (error) {
       console.error("Failed to fetch data:", error);
-      setData([]); // Handle the error state as you see fit
+      setData([]); // Set empty data or handle errors as needed
     }
+    setLoding(false); // Stop loading irrespective of the data received
   };
 
   useEffect(() => {
