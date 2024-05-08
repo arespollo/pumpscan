@@ -29,12 +29,22 @@ const CryptoTable = () => {
 
   const fetchCryptoData = async () => {
     const urls = [
-      `https://client-api-2-74b1891ee9f9.herokuapp.com/coins?offset=${0}&limit=${50}&sort=market_cap&order=DESC&includeNsfw=false&complete=false`,
-      `https://client-api-2-74b1891ee9f9.herokuapp.com/coins?offset=${50}&limit=${50}&sort=market_cap&order=DESC&includeNsfw=false&complete=false`,
-      `https://client-api-2-74b1891ee9f9.herokuapp.com/coins?offset=${100}&limit=${50}&sort=market_cap&order=DESC&includeNsfw=false&complete=false`,
-      `https://client-api-2-74b1891ee9f9.herokuapp.com/coins?offset=${150}&limit=${50}&sort=market_cap&order=DESC&includeNsfw=false&complete=false`,
-      `https://client-api-2-74b1891ee9f9.herokuapp.com/coins?offset=${200}&limit=${50}&sort=market_cap&order=DESC&includeNsfw=false&complete=false`,
-      `https://client-api-2-74b1891ee9f9.herokuapp.com/coins?offset=${250}&limit=${50}&sort=market_cap&order=DESC&includeNsfw=false&complete=false`,
+      `https://client-api-2-74b1891ee9f9.herokuapp.com/coins?offset=${150}&limit=${50}&sort=market_cap&order=DESC&includeNsfw=false`,
+      `https://client-api-2-74b1891ee9f9.herokuapp.com/coins?offset=${200}&limit=${50}&sort=market_cap&order=DESC&includeNsfw=false`,
+      `https://client-api-2-74b1891ee9f9.herokuapp.com/coins?offset=${250}&limit=${50}&sort=market_cap&order=DESC&includeNsfw=false`,
+      `https://client-api-2-74b1891ee9f9.herokuapp.com/coins?offset=${300}&limit=${50}&sort=market_cap&order=DESC&includeNsfw=false`,
+      `https://client-api-2-74b1891ee9f9.herokuapp.com/coins?offset=${350}&limit=${50}&sort=market_cap&order=DESC&includeNsfw=false`,
+      `https://client-api-2-74b1891ee9f9.herokuapp.com/coins?offset=${400}&limit=${50}&sort=market_cap&order=DESC&includeNsfw=false`,
+      `https://client-api-2-74b1891ee9f9.herokuapp.com/coins?offset=${450}&limit=${50}&sort=market_cap&order=DESC&includeNsfw=false`,
+      `https://client-api-2-74b1891ee9f9.herokuapp.com/coins?offset=${500}&limit=${50}&sort=market_cap&order=DESC&includeNsfw=false`,
+      `https://client-api-2-74b1891ee9f9.herokuapp.com/coins?offset=${550}&limit=${50}&sort=market_cap&order=DESC&includeNsfw=false`,
+      `https://client-api-2-74b1891ee9f9.herokuapp.com/coins?offset=${600}&limit=${50}&sort=market_cap&order=DESC&includeNsfw=false`,
+      `https://client-api-2-74b1891ee9f9.herokuapp.com/coins?offset=${650}&limit=${50}&sort=market_cap&order=DESC&includeNsfw=false`,
+      `https://client-api-2-74b1891ee9f9.herokuapp.com/coins?offset=${700}&limit=${50}&sort=market_cap&order=DESC&includeNsfw=false`,
+      `https://client-api-2-74b1891ee9f9.herokuapp.com/coins?offset=${750}&limit=${50}&sort=market_cap&order=DESC&includeNsfw=false`,
+      `https://client-api-2-74b1891ee9f9.herokuapp.com/coins?offset=${800}&limit=${50}&sort=market_cap&order=DESC&includeNsfw=false`,
+      `https://client-api-2-74b1891ee9f9.herokuapp.com/coins?offset=${850}&limit=${50}&sort=market_cap&order=DESC&includeNsfw=false`,
+      `https://client-api-2-74b1891ee9f9.herokuapp.com/coins?offset=${900}&limit=${50}&sort=market_cap&order=DESC&includeNsfw=false`,
     ];
     try {
       const promises = urls.map((url) => axios.get(url));
@@ -60,7 +70,9 @@ const CryptoTable = () => {
       // Filter data based on criteria
       fetchedData = fetchedData.filter(
         (item) =>
-          isRecent(item.created_timestamp) && item.usd_market_cap < 65000
+          isRecent(item.created_timestamp) &&
+          item.usd_market_cap <= 65000 &&
+          item.complete === false
       );
 
       // Only update the state if the filtered data is not empty
