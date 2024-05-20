@@ -29,22 +29,31 @@ const CryptoTable = () => {
 
   const fetchCryptoData = async () => {
     const urls = [
-      `https://client-api-2-74b1891ee9f9.herokuapp.com/coins?offset=${150}&limit=${50}&sort=market_cap&order=DESC&includeNsfw=false`,
-      `https://client-api-2-74b1891ee9f9.herokuapp.com/coins?offset=${200}&limit=${50}&sort=market_cap&order=DESC&includeNsfw=false`,
-      `https://client-api-2-74b1891ee9f9.herokuapp.com/coins?offset=${250}&limit=${50}&sort=market_cap&order=DESC&includeNsfw=false`,
-      `https://client-api-2-74b1891ee9f9.herokuapp.com/coins?offset=${300}&limit=${50}&sort=market_cap&order=DESC&includeNsfw=false`,
-      `https://client-api-2-74b1891ee9f9.herokuapp.com/coins?offset=${350}&limit=${50}&sort=market_cap&order=DESC&includeNsfw=false`,
-      `https://client-api-2-74b1891ee9f9.herokuapp.com/coins?offset=${400}&limit=${50}&sort=market_cap&order=DESC&includeNsfw=false`,
-      `https://client-api-2-74b1891ee9f9.herokuapp.com/coins?offset=${450}&limit=${50}&sort=market_cap&order=DESC&includeNsfw=false`,
-      `https://client-api-2-74b1891ee9f9.herokuapp.com/coins?offset=${500}&limit=${50}&sort=market_cap&order=DESC&includeNsfw=false`,
-      `https://client-api-2-74b1891ee9f9.herokuapp.com/coins?offset=${550}&limit=${50}&sort=market_cap&order=DESC&includeNsfw=false`,
-      `https://client-api-2-74b1891ee9f9.herokuapp.com/coins?offset=${600}&limit=${50}&sort=market_cap&order=DESC&includeNsfw=false`,
-      `https://client-api-2-74b1891ee9f9.herokuapp.com/coins?offset=${650}&limit=${50}&sort=market_cap&order=DESC&includeNsfw=false`,
+      `https://client-api-2-74b1891ee9f9.herokuapp.com/coins?offset=${0}&limit=${50}&sort=created_timestamp&order=DESC&includeNsfw=false`,
+      `https://client-api-2-74b1891ee9f9.herokuapp.com/coins?offset=${50}&limit=${50}&sort=created_timestamp&order=DESC&includeNsfw=false`,
+      `https://client-api-2-74b1891ee9f9.herokuapp.com/coins?offset=${100}&limit=${50}&sort=created_timestamp&order=DESC&includeNsfw=false`,
+      `https://client-api-2-74b1891ee9f9.herokuapp.com/coins?offset=${150}&limit=${50}&sort=created_timestamp&order=DESC&includeNsfw=false`,
+      `https://client-api-2-74b1891ee9f9.herokuapp.com/coins?offset=${200}&limit=${50}&sort=created_timestamp&order=DESC&includeNsfw=false`,
+      `https://client-api-2-74b1891ee9f9.herokuapp.com/coins?offset=${250}&limit=${50}&sort=created_timestamp&order=DESC&includeNsfw=false`,
+      `https://client-api-2-74b1891ee9f9.herokuapp.com/coins?offset=${300}&limit=${50}&sort=created_timestamp&order=DESC&includeNsfw=false`,
+      `https://client-api-2-74b1891ee9f9.herokuapp.com/coins?offset=${350}&limit=${50}&sort=created_timestamp&order=DESC&includeNsfw=false`,
+      `https://client-api-2-74b1891ee9f9.herokuapp.com/coins?offset=${400}&limit=${50}&sort=created_timestamp&order=DESC&includeNsfw=false`,
+      `https://client-api-2-74b1891ee9f9.herokuapp.com/coins?offset=${450}&limit=${50}&sort=created_timestamp&order=DESC&includeNsfw=false`,
+      `https://client-api-2-74b1891ee9f9.herokuapp.com/coins?offset=${500}&limit=${50}&sort=created_timestamp&order=DESC&includeNsfw=false`,
+      `https://client-api-2-74b1891ee9f9.herokuapp.com/coins?offset=${550}&limit=${50}&sort=created_timestamp&order=DESC&includeNsfw=false`,
+      `https://client-api-2-74b1891ee9f9.herokuapp.com/coins?offset=${600}&limit=${50}&sort=created_timestamp&order=DESC&includeNsfw=false`,
     ];
     try {
       const promises = urls.map((url) => axios.get(url));
       const results = await Promise.all(promises);
-      return results.flatMap((result) => result.data);
+      let data = results.flatMap((result) => result.data);
+      // Remove duplicates based on 'mint'
+      const uniqueData = Array.from(new Set(data.map((a) => a.mint))).map(
+        (mint) => {
+          return data.find((a) => a.mint === mint);
+        }
+      );
+      return uniqueData;
     } catch (error) {
       console.error("Failed to fetch data:", error);
       throw error;
