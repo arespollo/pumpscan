@@ -40,11 +40,6 @@ const CryptoTable = () => {
       `https://client-api-2-74b1891ee9f9.herokuapp.com/coins?offset=${550}&limit=${50}&sort=market_cap&order=DESC&includeNsfw=false`,
       `https://client-api-2-74b1891ee9f9.herokuapp.com/coins?offset=${600}&limit=${50}&sort=market_cap&order=DESC&includeNsfw=false`,
       `https://client-api-2-74b1891ee9f9.herokuapp.com/coins?offset=${650}&limit=${50}&sort=market_cap&order=DESC&includeNsfw=false`,
-      `https://client-api-2-74b1891ee9f9.herokuapp.com/coins?offset=${700}&limit=${50}&sort=market_cap&order=DESC&includeNsfw=false`,
-      `https://client-api-2-74b1891ee9f9.herokuapp.com/coins?offset=${750}&limit=${50}&sort=market_cap&order=DESC&includeNsfw=false`,
-      `https://client-api-2-74b1891ee9f9.herokuapp.com/coins?offset=${800}&limit=${50}&sort=market_cap&order=DESC&includeNsfw=false`,
-      `https://client-api-2-74b1891ee9f9.herokuapp.com/coins?offset=${850}&limit=${50}&sort=market_cap&order=DESC&includeNsfw=false`,
-      `https://client-api-2-74b1891ee9f9.herokuapp.com/coins?offset=${900}&limit=${50}&sort=market_cap&order=DESC&includeNsfw=false`,
     ];
     try {
       const promises = urls.map((url) => axios.get(url));
